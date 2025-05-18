@@ -5,62 +5,26 @@ Userprofile, Userinternship, Companyinternship, Scadinternship, Userhistory, Wri
 import * as ReactDOM from 'react-dom/client';
 import { StyledEngineProvider } from '@mui/material/styles';
 
-type UserType = 'student' | 'scad' | 'faculty' | 'company' | '';
-
-interface UserContextType {
-  userType: UserType;
-  setUserType: (type: UserType) => void;
-}
-
-const UserContext = createContext<UserContextType>({
-  userType: '',
-  setUserType: () => {}
-});
-
+const UserContext = createContext(null);
+//test
 export const useUser = () => {
   return useContext(UserContext);
 };
 
-const ProtectedRoute = ({ allowedUserTypes, children }: { allowedUserTypes: UserType[]; children: React.ReactNode }) => {
+
+const ProtectedRoute = ({ allowedUserTypes, children }: { allowedUserTypes: string[]; children: React.ReactNode }) => {
   const { userType } = useUser();
 
-  if (!userType) {
-    return <Navigate to="/login" replace />;
-  }
-
   if (!allowedUserTypes.includes(userType)) {
-    switch(userType) {
-      case 'student':
-        return <Navigate to="/userdashboard" replace />;
-      case 'scad':
-        return <Navigate to="/scaddashboard" replace />;
-      case 'faculty':
-        return <Navigate to="/facultydashboard" replace />;
-      case 'company':
-        return <Navigate to="/companydashboard" replace />;
-      default:
-        return <Navigate to="/login" replace />;
-    }
+
+    return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;
 };
 
 function App() {
-  const [userType, setUserTypeState] = useState<UserType>(() => {
-    // Initialize from localStorage if available
-    return localStorage.getItem('userType') as UserType || '';
-  });
-
-  // Create a wrapped setUserType that updates both state and localStorage
-  const setUserType = (type: UserType) => {
-    setUserTypeState(type);
-    if (type) {
-      localStorage.setItem('userType', type);
-    } else {
-      localStorage.removeItem('userType');
-    }
-  };
+  const [userType, setUserType] = useState('user');
 
   return (
     <main>
@@ -71,13 +35,11 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/login" element={<Login />} />
-              
               {/* Protected Routes */}
               <Route
                 path="/onboard"
                 element={
-                  <ProtectedRoute allowedUserTypes={['student', 'scad', 'faculty', 'company']}>
+                  <ProtectedRoute allowedUserTypes={['admin', 'user']}>
                     <Onboard />
                   </ProtectedRoute>
                 }
@@ -85,181 +47,106 @@ function App() {
               <Route
                 path="/useronboard"
                 element={
-                  <ProtectedRoute allowedUserTypes={['student']}>
+                  <ProtectedRoute allowedUserTypes={['admin', 'user']}>
                     <UserOnboard />
                   </ProtectedRoute>
                 }
               />
-              
-              {/* User-only routes */}
+              <Route
+                path="/login"
+                element={<Login />}
+              />
+              <Route
+              path="/workshop/vod" 
+              element={<WorkshopsVod/>} 
+              />
+              <Route
+              path="/workshop/live" 
+              element={<WorkshopsLive/>} 
+              />
               <Route
                 path="/userdashboard/:status"
-                element={
-                  <ProtectedRoute allowedUserTypes={['student']}>
-                    <Userdashboard />
-                  </ProtectedRoute>
-                }
-              />
+                element={<Userdashboard />}
+              /> {/* Dynamic URL */}
+
               <Route
                 path="/userdashboard"
-                element={
-                  <ProtectedRoute allowedUserTypes={['student']}>
-                    <Userdashboard />
-                  </ProtectedRoute>
-                } 
-              />
+                element={<Userdashboard />} />
+
               <Route
                 path="/userdashboard/internship/:status"
-                element={
-                  <ProtectedRoute allowedUserTypes={['student']}>
-                    <Userinternship />
-                  </ProtectedRoute>
-                }
+                element={<Userinternship />}
+              /> {/* Dynamic URL */}
+
+                            <Route
+                path="/userdashboard/history/:status"
+                element={<Userhistory />}
+              /> {/* Dynamic URL */}
+
+              <Route
+                path="/scaddashboard"
+                element={<Scaddashboard />}
               />
               <Route
-                path="/userdashboard/history/:status"
-                element={
-                  <ProtectedRoute allowedUserTypes={['student']}>
-                    <Userhistory />
-                  </ProtectedRoute>
-                }
+                path="/facultydashboard"
+                element={<Facultydashboard />}
+              />
+              <Route
+                path="/companydashboard"
+                element={<Companydashboard />}
               />
               <Route
                 path="/userdashboard/profile"
-                element={
-                  <ProtectedRoute allowedUserTypes={['student']}>
-                    <Userprofile />
-                  </ProtectedRoute>
-                }
+                element={<Userprofile />}
               />
               <Route
                 path="/userdashboard/internship"
-                element={
-                  <ProtectedRoute allowedUserTypes={['student']}>
-                    <Userinternship />
-                  </ProtectedRoute>
-                }
+                element={<Userinternship />}
               />
               <Route
                 path="/userdashboard/history"
-                element={
-                  <ProtectedRoute allowedUserTypes={['student']}>
-                    <Userhistory />
-                  </ProtectedRoute>
-                }
-              />
-              
-              {/* SCAD-only routes */}
-              <Route
-                path="/scaddashboard"
-                element={
-                  <ProtectedRoute allowedUserTypes={['scad']}>
-                    <Scaddashboard />
-                  </ProtectedRoute>
-                }
+                element={<Userhistory />}
               />
               <Route
                 path="/scaddashboard/internship"
-                element={
-                  <ProtectedRoute allowedUserTypes={['scad']}>
-                    <Scadinternship />
-                  </ProtectedRoute>
-                }
+                element={<Scadinternship />}
               />
               <Route
-                path="/scaddashboard/students"
-                element={
-                  <ProtectedRoute allowedUserTypes={['scad']}>
-                    <ScadStudents />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/scaddashboard/reports"
-                element={
-                  <ProtectedRoute allowedUserTypes={['scad']}>
-                    <ScadReports />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/VideoCallPageScad"
-                element={
-                  <ProtectedRoute allowedUserTypes={['scad']}>
-                    <VideoCallPageScad />
-                  </ProtectedRoute>
-                }
-              />
-              
-              {/* Faculty-only routes */}
-              <Route
-                path="/facultydashboard"
-                element={
-                  <ProtectedRoute allowedUserTypes={['faculty']}>
-                    <Facultydashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/facultydashboard/reports"
-                element={
-                  <ProtectedRoute allowedUserTypes={['faculty']}>
-                    <FacultyReports />
-                  </ProtectedRoute>
-                }
-              />
-              
-              {/* Company-only routes */}
-              <Route
-                path="/companydashboard"
-                element={
-                  <ProtectedRoute allowedUserTypes={['company']}>
-                    <Companydashboard />
-                  </ProtectedRoute>
-                }
+                path="/evaluation"
+                element={<WritingEvaluation />}
               />
               <Route
                 path="/companydashboard/internship"
-                element={
-                  <ProtectedRoute allowedUserTypes={['company']}>
-                    <Companyinternship />
-                  </ProtectedRoute>
-                }
+                element={<Companyinternship />}
+              />
+              <Route
+                path="/scaddashboard/students"
+                element={<ScadStudents />}
+              />
+              <Route
+                path="/scaddashboard/reports"
+                element={<ScadReports />}
               />
               <Route
                 path="/companydashboard/interns"
-                element={
-                  <ProtectedRoute allowedUserTypes={['company']}>
-                    <CompanyInterns />
-                  </ProtectedRoute>
-                }
+                element={<CompanyInterns />}
               />
+
+              <Route
+                path="/facultydashboard/reports"
+                element={<FacultyReports />}
+              />
+
               <Route
                 path="/VideoCallPage"
-                element={
-                  <ProtectedRoute allowedUserTypes={['student', 'scad', 'faculty', 'company']}>
-                    <VideoCallpage />
-                  </ProtectedRoute>
-                }
+                element={<VideoCallpage />}
               />
-              
-              {/* Workshop routes */}
+
               <Route
-                path="/workshop/vod" 
-                element={
-                  <ProtectedRoute allowedUserTypes={['student', 'scad', 'faculty', 'company']}>
-                    <WorkshopsVod/>
-                  </ProtectedRoute>
-                } 
+                path="/VideoCallPageScad"
+                element={<VideoCallPageScad />}
               />
-              <Route
-                path="/workshop/live" 
-                element={
-                  <ProtectedRoute allowedUserTypes={['student', 'scad', 'faculty', 'company']}>
-                    <WorkshopsLive/>
-                  </ProtectedRoute>
-                } 
-              />
+
             </Routes>
           </div>
         </BrowserRouter>
