@@ -11,7 +11,7 @@ import MenuContent from './MenuContent';
 import NotificationsMenu from './NotificationsMenu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../../../app'; // Import your UserContext hook
+import { useUser } from '../../../App'; // Import your UserContext hook
 
 interface SideMenuMobileProps {
   open: boolean | undefined;

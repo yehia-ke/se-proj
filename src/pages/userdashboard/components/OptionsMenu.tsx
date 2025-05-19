@@ -11,7 +11,7 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import MenuButton from './MenuButton';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../../../app'; // Import your UserContext hook
+import { useUser } from '../../../App'; // Import your UserContext hook
 
 const MenuItem = styled(MuiMenuItem)({
   margin: '2px 0',
